@@ -80,6 +80,18 @@ export function OtherLines({ loc }: { loc: Location }) {
         >
           Sushi Line
         </p>
+        <p className="mt-8 text-center text-xs text-rice/45">
+          Developed and Designed by{" "}
+          <a
+            href="https://gianluh.dev"
+            rel="noreferrer"
+            target="_blank"
+            className="inline-flex items-center gap-1 text-rice/80 underline decoration-rice/25 underline-offset-4 transition-colors hover:text-teal-hi hover:decoration-teal-hi"
+          >
+            Gianluca De Maio
+            <i className="ri-external-link-line" aria-hidden />
+          </a>
+        </p>
       </footer>
     </section>
   )
