@@ -1,5 +1,5 @@
-import { motion } from "framer-motion"
-import { useState } from "react"
+import { motion, useReducedMotion } from "framer-motion"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
 import { Page } from "../components/Page"
 import { StatusDot } from "../components/StatusDot"
@@ -15,6 +15,16 @@ export default function Picker() {
   const navigate = useNavigate()
   const now = useNow()
   const { meal } = currentService(now)
+  const reduce = useReducedMotion()
+
+  // Navigate on a timer, not on onAnimationComplete: on touch screens the tap
+  // fires hover and click together, the chosen curtain is already at flexGrow 1,
+  // nothing animates and the completion callback never runs.
+  useEffect(() => {
+    if (!chosen) return
+    const id = setTimeout(() => navigate(`/${chosen}`, { state: { from: "picker" } }), reduce ? 0 : 950)
+    return () => clearTimeout(id)
+  }, [chosen, navigate, reduce])
 
   return (
     <Page>
@@ -50,7 +60,6 @@ export default function Picker() {
               chosen={chosen}
               onHover={setHover}
               onChoose={() => setChosen(loc.slug)}
-              onDone={() => navigate(`/${loc.slug}`, { state: { from: "picker" } })}
             />
           ))}
         </div>
@@ -67,7 +76,6 @@ function Curtain({
   chosen,
   onHover,
   onChoose,
-  onDone,
 }: {
   loc: Location
   i: number
@@ -75,7 +83,6 @@ function Curtain({
   chosen: Slug | null
   onHover: (s: Slug | null) => void
   onChoose: () => void
-  onDone: () => void
 }) {
   const st = useStatus(loc)
   const desktop = useMediaQuery("(min-width: 768px)")
@@ -96,7 +103,6 @@ function Curtain({
       animate={{ flexGrow: grow }}
       initial={false}
       transition={{ duration: chosen ? 0.95 : 0.75, ease }}
-      onAnimationComplete={() => isChosen && onDone()}
     >
       {/* the curtain drops in from the rod */}
       <motion.div
